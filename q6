@@ -1,0 +1,112 @@
+#include <iostream>
+using namespace std;
+
+struct Element {
+    int i, j, x;
+};
+
+class SparseMatrix {
+private:
+    int m, n, num;
+    Element *ele;
+
+public:
+    SparseMatrix(int m, int n, int num) {
+        this->m = m;
+        this->n = n;
+        this->num = num;
+        ele = new Element[this->num];
+    }
+
+    void read() {
+        cout << "Enter non-zero elements (row column value):" << endl;
+        for (int i = 0; i < num; i++) {
+            cout << "Element " << (i+1) << ": ";
+            cin >> ele[i].i >> ele[i].j >> ele[i].x;
+        }
+    }
+
+    void display() {
+        int k = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (k < num && ele[k].i == i && ele[k].j == j)
+                    cout << ele[k++].x << " ";
+                else
+                    cout << "0 ";
+            }
+            cout << endl;
+        }
+    }
+
+    SparseMatrix* transpose() {
+        SparseMatrix *s = new SparseMatrix(n, m, num);
+        int i = 0;
+        for (int k = 0; k < n; k++) {
+            for (int j = 0; j < num; j++) {
+                if (ele[j].j == k) {
+                    s->ele[i].i = ele[j].j;
+                    s->ele[i].j = ele[j].i;
+                    s->ele[i].x = ele[j].x;
+                    i++;
+                }
+            }
+        }
+        return s;
+    }
+
+    SparseMatrix* add(SparseMatrix &s) {
+        if (m != s.m || n != s.n)
+            return nullptr;
+        SparseMatrix *sum = new SparseMatrix(m, n, num + s.num);
+        int i = 0, j = 0, k = 0;
+        while (i < num && j < s.num) {
+            if (ele[i].i < s.ele[j].i ||
+                (ele[i].i == s.ele[j].i && ele[i].j < s.ele[j].j)) {
+                sum->ele[k++] = ele[i++];
+            } else if (ele[i].i > s.ele[j].i ||
+                       (ele[i].i == s.ele[j].i && ele[i].j > s.ele[j].j)) {
+                sum->ele[k++] = s.ele[j++];
+            } else {
+                sum->ele[k] = ele[i];
+                sum->ele[k++].x = ele[i++].x + s.ele[j++].x;
+            }
+        }
+        for (; i < num; i++)
+            sum->ele[k++] = ele[i];
+        for (; j < s.num; j++)
+            sum->ele[k++] = s.ele[j];
+        sum->num = k;
+        return sum;
+    }
+
+    ~SparseMatrix() {
+        delete[] ele;
+    }
+};
+
+int main() {
+    int m, n, num;
+    
+    cout << "Enter dimensions of sparse matrix (rows columns): ";
+    cin >> m >> n;
+    
+    cout << "Enter number of non-zero elements: ";
+    cin >> num;
+    
+    SparseMatrix sm1(m, n, num);
+    sm1.read();
+    
+    cout << "\nOriginal Sparse Matrix:" << endl;
+    sm1.display();
+    
+    // Transpose
+    SparseMatrix *transpose = sm1.transpose();
+    cout << "\nTranspose of Matrix:" << endl;
+    transpose->display();
+    
+    
+    delete transpose;
+    
+    return 0;
+}

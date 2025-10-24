@@ -1,0 +1,66 @@
+#include <iostream>
+using namespace std;
+
+int compareStrings(const char str1[], const char str2[]) {
+    int i = 0;
+    while (str1[i] != '\0' && str2[i] != '\0') {
+        if (str1[i] < str2[i]) return -1;
+        if (str1[i] > str2[i]) return 1;
+        i++;
+    }
+    if (str1[i] == '\0' && str2[i] == '\0') return 0;
+    if (str1[i] == '\0') return -1;
+    return 1;
+}
+
+void copyString(char dest[], const char src[]) {
+    int i = 0;
+    while (src[i] != '\0') {
+        dest[i] = src[i];
+        i++;
+    }
+    dest[i] = '\0';
+}
+
+void sortStrings(char arr[][50], int n) {
+    char temp[50];
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (compareStrings(arr[j], arr[j + 1]) > 0) {
+                copyString(temp, arr[j]);
+                copyString(arr[j], arr[j + 1]);
+                copyString(arr[j + 1], temp);
+            }
+        }
+    }
+}
+
+int main() {
+    int n;
+    
+    cout << "Enter the number of strings: ";
+    cin >> n;
+    cin.ignore(); // Clear the newline character
+    
+    char arr[n][50];
+    
+    cout << "Enter " << n << " strings:" << endl;
+    for (int i = 0; i < n; i++) {
+        cout << "String " << (i+1) << ": ";
+        cin.getline(arr[i], 50);
+    }
+    
+    cout << "\nOriginal strings:" << endl;
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << endl;
+    }
+    
+    sortStrings(arr, n);
+    
+    cout << "\nSorted strings:" << endl;
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << endl;
+    }
+    
+    return 0;
+}
